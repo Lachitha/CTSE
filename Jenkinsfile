@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     sh 'export DOCKER_BUILDKIT=1'
-                    sh "docker buildx build --tag $DOCKER_IMAGE_NAME --file $DOCKERFILE_PATH ."
+                    sh "docker buildx build -t $DOCKER_IMAGE_NAME --file $DOCKERFILE_PATH ."
                 }
             }
         }
