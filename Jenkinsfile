@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     stages {
-        stage('Deploy To Kubernetes') {
-            steps {
+        stage('Deploy To Kubernetes') { 
+            steps { 
                 script {
                     withKubeCredentials(
                         credentialsId: 'k8-token',
