@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools {
         nodejs 'node' // Use the NodeJS installation name defined in Jenkins
-        docker 'docker' // Use the Docker installation name defined in Jenkins
+       
     }
     environment {
         DOCKER_CREDENTIALS_ID = 'docker-cred'
