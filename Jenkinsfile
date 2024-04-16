@@ -2,11 +2,11 @@ pipeline {
     agent any
     tools {
         nodejs 'node' // Use the NodeJS installation name defined in Jenkins
-       
     }
     environment {
         DOCKER_CREDENTIALS_ID = 'docker-cred'
         DOCKER_IMAGE_NAME = 'lachisenarath576259/nodemain:latest'
+        DOCKERFILE_PATH = '/var/lib/jenkins/workspace/MicroService_MERN_main/Dockerfile' // Update Dockerfile path
     }
     stages { 
         stage('Node JS Build') {
@@ -17,7 +17,8 @@ pipeline {
         stage('Build & Tag Docker Image') {
             steps {
                 script {
-                    docker.build(DOCKER_IMAGE_NAME, '.')
+                    sh 'export DOCKER_BUILDKIT=1'
+                    sh "docker buildx build --tag $DOCKER_IMAGE_NAME --file $DOCKERFILE_PATH ."
                 }
             }
         }
