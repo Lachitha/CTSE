@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t lachisenarath576259/nodemain:latest ."
+                        sh "docker build -t lachisenarath576259/nodemain:latest"
                     }
                 }
             }
