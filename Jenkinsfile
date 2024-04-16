@@ -3,34 +3,38 @@ pipeline {
     tools {
         nodejs 'node' // Use the NodeJS installation name defined in Jenkins
     }
-    environment {
-        DOCKER_CREDENTIALS_ID = 'docker-cred'
-        DOCKER_IMAGE_NAME = 'lachisenarath576259/nodemain:latest'
-        DOCKERFILE_PATH = '/var/lib/jenkins/workspace/MicroService_MERN_main/Dockerfile' // Update Dockerfile path
-    }
+   
     stages { 
         stage('Node JS Build') {
             steps {
                 sh 'npm install'
             }
         }
+ 
+
+   
         stage('Build & Tag Docker Image') {
             steps {
                 script {
-                    sh 'export DOCKER_BUILDKIT=1'
-                    sh "docker buildx build -t $DOCKER_IMAGE_NAME --file $DOCKERFILE_PATH ."
-                }
-            }
-        }
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
-                        docker.image(DOCKER_IMAGE_NAME).push('latest')
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t lachisenarath576259/lachitha:latest ."
                     }
                 }
             }
         }
+        
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push lachisenarath576259/lachitha:latest "
+                    }
+                }
+            }
+        }
+
+
+
         stage('Deploy To Kubernetes') {
             steps {
                 withKubeConfig(credentialsId: 'k8-token', serverUrl: 'https://800F84F142BBCD88A8B3616C37B6CB94.gr7.ap-southeast-1.eks.amazonaws.com', namespace: 'webapps') {
