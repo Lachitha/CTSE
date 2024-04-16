@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: nodejs-app
-  namespace: default
+  namespace: webapps
   labels:
     app: nodejs-app
 spec:
@@ -16,10 +16,10 @@ spec:
         app: nodejs-app
     spec:
       containers:
-      - name: nodejs-app
-        image: "devopshint/lachitha"
-        ports:
-          - containerPort: 3000
+        - name: nodejs-app
+          image: "lachisenarath576259/lachitha"
+          ports:
+            - containerPort: 3000
 ---
 apiVersion: v1
 kind: Service
@@ -31,6 +31,6 @@ spec:
     app: nodejs-app
   type: LoadBalancer
   ports:
-  - name: http
-    targetPort: 3000
-    port: 80
+    - name: http
+      targetPort: 3000
+      port: 80
