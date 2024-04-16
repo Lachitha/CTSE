@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nodejs-app
-        image: "devopshint/nodemain:latest"
+        image: "devopshint/lachitha"
         ports:
           - containerPort: 3000
 ---
