@@ -1,50 +1,48 @@
 pipeline {
     agent any
-     tools {
+    tools {
         nodejs 'node' // Use the NodeJS installation name defined in Jenkins
+        docker 'docker' // Use the Docker installation name defined in Jenkins
     }
- 
+    environment {
+        DOCKER_CREDENTIALS_ID = 'docker-cred'
+        DOCKER_IMAGE_NAME = 'lachisenarath576259/nodemain:latest'
+    }
     stages { 
-
         stage('Node JS Build') {
-      steps {
-        sh 'npm install'
-      }
-    }
-           stage('Build & Tag Docker Image') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Build & Tag Docker Image') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t lachisenarath576259/nodemain:latest"
-                    }
+                    docker.build(DOCKER_IMAGE_NAME, '.')
                 }
             }
         }
-        
         stage('Push Docker Image') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker push lachisenarath576259/nodemain:latest "
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        docker.image(DOCKER_IMAGE_NAME).push('latest')
                     }
                 }
             }
         }
         stage('Deploy To Kubernetes') {
             steps {
-               withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'EKS-2', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', serverUrl: 'https://800F84F142BBCD88A8B3616C37B6CB94.gr7.ap-southeast-1.eks.amazonaws.com']]) {
-                 sh "kubectl apply -f deployment-service.yml"
-                }  
+                withKubeConfig(credentialsId: 'k8-token', serverUrl: 'https://800F84F142BBCD88A8B3616C37B6CB94.gr7.ap-southeast-1.eks.amazonaws.com', namespace: 'webapps') {
+                    sh "kubectl apply -f deployment-service.yml"
+                }
             }
         }
-         
-           stage('verify Deployment') {
+        stage('Verify Deployment') {
             steps {
-               withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'EKS-2', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', serverUrl: 'https://800F84F142BBCD88A8B3616C37B6CB94.gr7.ap-southeast-1.eks.amazonaws.com']]) {
-                 sh "kubectl get svc -n webapps"
+                withKubeConfig(credentialsId: 'k8-token', serverUrl: 'https://800F84F142BBCD88A8B3616C37B6CB94.gr7.ap-southeast-1.eks.amazonaws.com', namespace: 'webapps') {
+                    sh "kubectl get svc -n webapps"
                 }
             }
         }
     }
-    
 }
