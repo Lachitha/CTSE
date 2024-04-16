@@ -1,37 +1,6 @@
 pipeline {
     agent any
-    tools {
-        nodejs 'node' // Use the NodeJS installation name defined in Jenkins
-    }
-   
-    stages { 
-        stage('Node JS Build') { 
-            steps {
-                sh 'npm install'
-            }
-        }
- 
 
-   
-        stage('Build & Tag Docker Image') {
-            steps {
-                script {
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t lachisenarath576259/lachitha ."
-                    }
-                }
-            }
-        }
-        
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker push lachisenarath576259/lachitha "
-                    }
-                }
-            }
-        }
 
 
 
@@ -50,4 +19,4 @@ pipeline {
             }
         }
     }
-}
+
